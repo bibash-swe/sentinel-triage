@@ -89,16 +89,16 @@ async def triage_ticket(request: TriageRequest):
             detail=f"API Policy or Context limit hit: {str(e)}"
         )
 
-    except RuntimeError as e:
-        logger.critical(f"REPAIR_BUDGET_EXHAUSTED_ABORT: System failed semantic self-repair loops: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=f"Semantic Validation Failure: {str(e)}"
-        )
-
     except Exception as e:
         logger.critical(f"FATAL_UNHANDLED_EXCEPTION: Pipeline error encountered: {str(e)}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="System failed processing request. Please refer to operational telemetry."
+        )
+
+    except RuntimeError as e:
+        logger.critical(f"REPAIR_BUDGET_EXHAUSTED_ABORT: System failed semantic self-repair loops: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Semantic Validation Failure: {str(e)}"
         )
