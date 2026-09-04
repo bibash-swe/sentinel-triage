@@ -6,6 +6,10 @@ from infrastructure.abstract_client import TruncationException, RefusalException
 logger = logging.getLogger("sentinel_triage.domain.service")
 T = TypeVar("T", bound=BaseModel)
 
+
+class RepairBudgetExhaustedError(Exception):
+    """Raised when the semantic repair loop cannot satisfy the schema."""
+
 class ExtractionService:
     """
     Domain orchestrator service coordinating extraction and semantic self-repair loops.
@@ -68,4 +72,6 @@ class ExtractionService:
                 raise
 
         logger.critical(f"REPAIR_LIMIT_EXHAUSTED: Semantic processing failed after {max_retries + 1} executions.")
-        raise RuntimeError(f"Semantic execution failed to satisfy safety & business constraints. Last error: {last_error}")
+        raise RepairBudgetExhaustedError(
+            f"Semantic execution failed to satisfy safety & business constraints. Last error: {last_error}"
+        )
